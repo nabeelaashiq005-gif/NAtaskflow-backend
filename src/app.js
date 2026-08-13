@@ -41,7 +41,11 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 // Serve uploaded avatar images at http://localhost:5000/uploads/avatars/<file>
-app.use("/uploads", express.static(path.resolve("public/uploads")));
+// (serverless platforms like Vercel have a read-only filesystem — skip there)
+const isServerless = process.env.VERCEL === "1";
+if (!isServerless) {
+  app.use("/uploads", express.static(path.resolve("public/uploads")));
+}
 
 // --- Health check (useful for confirming the server is alive) ---
 app.get("/health", (req, res) => {
